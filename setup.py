@@ -1,16 +1,16 @@
 from setuptools import setup
 
 setup(
-	name='RPyBeacon',
+	name='PyBeacon',
 	version='0.1.5',
-	packages=['RPyBeacon'],
+	packages=['PyBeacon'],
     entry_points = {
-        "console_scripts": ['RPyBeacon = RPyBeacon.RPyBeacon:main']
+        "console_scripts": ['PyBeacon = PyBeacon.PyBeacon:main']
     },
 
     description ='Make your raspberry pi 3 an Eddystone URL beacon',
 
-    url='https://github.com/nirmankarta/RPyBeacon',
+    url='https://github.com/nirmankarta/PyBeacon',
 
     author='Nirmankarta',
 
