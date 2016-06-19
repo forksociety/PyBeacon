@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 #
 # Copyright 2015 Opera Software ASA. All rights reserved.
 #
@@ -17,6 +17,7 @@
 Python script for scanning and advertising urls over Eddystone-URL.
 """
 import re
+import os
 import signal
 import subprocess
 import sys
@@ -24,6 +25,8 @@ import time
 import argparse
 from pprint import pprint
 
+
+DEVNULL = open(os.devnull, 'wb')
 # The default url
 url = "https://goo.gl/SkcDTN"
 
@@ -134,11 +137,11 @@ def scan(duration = None):
     is set to None, it scans until interrupted.
     """
     print("Scanning...")
-    subprocess.call("sudo hciconfig hci0 reset", shell = True, stdout = subprocess.DEVNULL)
+    subprocess.call("sudo hciconfig hci0 reset", shell = True, stdout = DEVNULL)
 
     lescan = subprocess.Popen(
             ["sudo", "-n", "hcitool", "lescan", "--duplicates"],
-            stdout = subprocess.DEVNULL)
+            stdout = DEVNULL)
     
     dump = subprocess.Popen(
             ["sudo", "-n", "hcidump", "--raw"],
@@ -250,34 +253,34 @@ def advertise(url):
     message = " ".join(message)
     verboseOutput("Message: " + message)
 
-    subprocess.call("sudo hciconfig hci0 up", shell = True, stdout = subprocess.DEVNULL)
+    subprocess.call("sudo hciconfig hci0 up", shell = True, stdout = DEVNULL)
 
     # Stop advertising
-    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x000a 00", shell = True, stdout = subprocess.DEVNULL)
+    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x000a 00", shell = True, stdout = DEVNULL)
 
     # Set message
-    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x0008 " + message, shell = True, stdout = subprocess.DEVNULL)
+    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x0008 " + message, shell = True, stdout = DEVNULL)
 
     # Resume advertising
-    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x000a 01", shell = True, stdout = subprocess.DEVNULL)
+    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x000a 01", shell = True, stdout = DEVNULL)
 
 
 def stopAdvertising():
     print("Stopping advertising")
     verboseOutput("Stopping advertising")
-    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x000a 00", shell = True, stdout = subprocess.DEVNULL)
+    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x000a 00", shell = True, stdout = DEVNULL)
 
 
 def main():
     subprocess.call(["sudo", "-v"])
     if args.terminate:
-    	stopAdvertising()
+        stopAdvertising()
     elif args.one:
-    	scan(3)
+        scan(3)
     elif args.scan:
-    	scan()
+        scan()
     else:
-    	advertise(args.url)
+        advertise(args.url)
 
 if __name__ == "__main__":
-	main()
+    main()
