@@ -1,10 +1,11 @@
-# RPyBeacon
-Make your raspberry pi 3 / Linux an Eddystone URL beacon
+# PyBeacon
+Python script for scanning and advertising urls over Eddystone-URL.
 
-*Requires Bluez*
+*Requirements*
 
-    sudo apt-get install bluez
+    Bluez -sudo apt-get install bluez
+    Python3
 
 *Install*
 
-    sudo pip install RPyBeacon
+    sudo pip install PyBeacon
