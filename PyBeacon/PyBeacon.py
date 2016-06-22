@@ -26,7 +26,7 @@ import argparse
 from pprint import pprint
 
 application_name = 'PyBeacon'
-version = '0.2.4.3'
+version = '0.2.4.3beta'
 
 if (sys.version_info > (3, 0)): 
     DEVNULL = subprocess.DEVNULL
