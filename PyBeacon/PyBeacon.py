@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 #
 # Copyright 2015 Opera Software ASA. All rights reserved.
 #
@@ -25,8 +25,14 @@ import time
 import argparse
 from pprint import pprint
 
+application_name = 'PyBeacon'
+version = '0.2.4.3'
 
-DEVNULL = open(os.devnull, 'wb')
+if (sys.version_info > (3, 0)): 
+    DEVNULL = subprocess.DEVNULL
+else:
+    DEVNULL = open(os.devnull, 'wb')
+
 # The default url
 url = "https://goo.gl/SkcDTN"
 
@@ -42,7 +48,7 @@ extensions = [
         ".com", ".org", ".edu", ".net", ".info", ".biz", ".gov",
         ]
 
-parser = argparse.ArgumentParser(prog='PyBeacon', description= __doc__)
+parser = argparse.ArgumentParser(prog=application_name, description= __doc__)
 
 parser.add_argument("-u", "--url", nargs='?', const=url, type=str,
     default=url, help='URL to advertise.')
@@ -52,7 +58,9 @@ parser.add_argument('-t','--terminate', action='store_true',
                     help='Stop advertising URL.')
 parser.add_argument('-o','--one', action='store_true',
                     help='Scan one URL only.')
-parser.add_argument("-v", "--verbose", action='store_true',
+parser.add_argument("-v", "--version", action='store_true',
+                    help='Version of ' + application_name + '.')
+parser.add_argument("-V", "--verbose", action='store_true',
                     help='Print lots of debug output.')
 
 args = parser.parse_args()
@@ -237,7 +245,6 @@ def encodeMessage(url):
 
 def advertise(url):
     print("Advertising: " + url)
-    verboseOutput("Advertising: " + url)
     message = encodeMessage(url)
 
     # Prepend the length of the whole message
@@ -267,13 +274,16 @@ def advertise(url):
 
 def stopAdvertising():
     print("Stopping advertising")
-    verboseOutput("Stopping advertising")
     subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x000a 00", shell = True, stdout = DEVNULL)
 
+def showVersion():
+    print(application_name + " " + version)
 
 def main():
     subprocess.call(["sudo", "-v"])
-    if args.terminate:
+    if args.version:
+        showVersion()
+    elif args.terminate:
         stopAdvertising()
     elif args.one:
         scan(3)

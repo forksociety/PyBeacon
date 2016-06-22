@@ -1,9 +1,9 @@
 from setuptools import setup
 
 setup(
-	name='PyBeacon',
-	version='0.2.2',
-	packages=['PyBeacon'],
+    name='PyBeacon',
+    version='0.2.4.3',
+    packages=['PyBeacon'],
     entry_points = {
         "console_scripts": ['PyBeacon = PyBeacon.PyBeacon:main']
     },
@@ -16,7 +16,7 @@ setup(
 
     license='MIT',
 
-	classifiers=[
+    classifiers=[
        
         'Development Status :: 4 - Beta',
 
