@@ -23,12 +23,14 @@ import subprocess
 import sys
 import time
 import argparse
+from . import __version__
 from pprint import pprint
 
 application_name = 'PyBeacon'
-version = '0.2.4.3beta'
+version = __version__ + 'beta'
 
-if (sys.version_info > (3, 0)): 
+
+if (sys.version_info > (3, 0)):
     DEVNULL = subprocess.DEVNULL
 else:
     DEVNULL = open(os.devnull, 'wb')
@@ -60,123 +62,14 @@ parser.add_argument('-o','--one', action='store_true',
                     help='Scan one URL only.')
 parser.add_argument("-v", "--version", action='store_true',
                     help='Version of ' + application_name + '.')
-parser.add_argument("-V", "--verbose", action='store_true',
+parser.add_argument("-V", "--Verbose", action='store_true',
                     help='Print lots of debug output.')
 
 args = parser.parse_args()
 
 def verboseOutput(text = ""):
-    if args.verbose:
+    if args.Verbose:
         sys.stderr.write(text + "\n")
-
-
-def decodeUrl(encodedUrl):
-    """
-    Decode a url encoded with the Eddystone (or UriBeacon) URL encoding scheme
-    """
-
-    decodedUrl = schemes[encodedUrl[0]]
-    for c in encodedUrl[1:]:
-        if c <= 0x20:
-            decodedUrl += extensions[c]
-        else:
-            decodedUrl += chr(c)
-
-    return decodedUrl
-
-
-def onUrlFound(url):
-    """
-    Called by onPacketFound, if the packet contains a url.
-    """
-
-    sys.stdout.write(url)
-    sys.stdout.write("\n")
-    sys.stdout.flush()
-
-
-foundPackets = set()
-
-def onPacketFound(packet):
-    """
-    Called by the scan function for each beacon packets found.
-    """
-
-    data = bytearray.fromhex(packet)
-
-    if args.one:
-        tmp = packet[:-3]
-        if tmp in foundPackets:
-            return
-        foundPackets.add(tmp)
-
-    # Eddystone
-    if len(data) >= 20 and data[19] == 0xaa and data[20] == 0xfe:
-        serviceDataLength = data[21]
-        frameType = data[25]
-
-        # Eddystone-URL
-        if frameType == 0x10:
-            verboseOutput("Eddystone-URL")
-            onUrlFound(decodeUrl(data[27:22 + serviceDataLength]))
-        elif frameType == 0x00:
-            verboseOutput("Eddystone-UID")
-        elif frameType == 0x20:
-            verboseOutput("Eddystone-TLM")
-        else:
-            verboseOutput("Unknown Eddystone frame type: {}".format(frameType))
-
-    # UriBeacon
-    elif len(data) >= 20 and data[19] == 0xd8 and data[20] == 0xfe:
-        serviceDataLength = data[21]
-        verboseOutput("UriBeacon")
-        onUrlFound(decodeUrl(data[27:22 + serviceDataLength]))
-
-    else:
-        verboseOutput("Unknown beacon type")
-
-    verboseOutput(packet)
-    verboseOutput()
-
-
-def scan(duration = None):
-    """
-    Scan for beacons. This function scans for [duration] seconds. If duration
-    is set to None, it scans until interrupted.
-    """
-    print("Scanning...")
-    subprocess.call("sudo hciconfig hci0 reset", shell = True, stdout = DEVNULL)
-
-    lescan = subprocess.Popen(
-            ["sudo", "-n", "hcitool", "lescan", "--duplicates"],
-            stdout = DEVNULL)
-    
-    dump = subprocess.Popen(
-            ["sudo", "-n", "hcidump", "--raw"],
-            stdout = subprocess.PIPE)
-
-    packet = None
-    try:
-        startTime = time.time()
-        for line in dump.stdout:
-            line = line.decode()
-            if line.startswith("> "):
-                if packet: onPacketFound(packet)
-                packet = line[2:].strip()
-            elif line.startswith("< "):
-                if packet: onPacketFound(packet)
-                packet = None
-            else:
-                if packet: packet += " " + line.strip()
-
-            if duration and time.time() - startTime > duration:
-                break
-
-    except KeyboardInterrupt:
-        pass
-
-    subprocess.call(["sudo", "kill", str(dump.pid), "-s", "SIGINT"])
-    subprocess.call(["sudo", "-n", "kill", str(lescan.pid), "-s", "SIGINT"])
 
 
 def encodeurl(url):
@@ -242,6 +135,158 @@ def encodeMessage(url):
 
     return message
 
+def decodeUrl(encodedUrl):
+    """
+    Decode a url encoded with the Eddystone (or UriBeacon) URL encoding scheme
+    """
+
+    decodedUrl = schemes[encodedUrl[0]]
+    for c in encodedUrl[1:]:
+        if c <= 0x20:
+            decodedUrl += extensions[c]
+        else:
+            decodedUrl += chr(c)
+
+    return decodedUrl
+
+
+def resolveUrl(url):
+    """
+    Follows redirects until the final url is found.
+    """
+
+    try:
+        if (sys.version_info > (3, 0)):
+            import http.client
+            import urllib.parse
+
+            parsed = urllib.parse.urlsplit(url)
+
+            conn = None
+            if parsed.scheme == "https":
+                conn = http.client.HTTPSConnection(parsed.netloc)
+            elif parsed.scheme == "http":
+                conn = http.client.HTTPConnection(parsed.netloc)
+
+            path = parsed.path
+            if parsed.query:
+                path += "&" + parsed.query
+
+            conn.request("HEAD", path)
+            response = conn.getresponse()
+        else:
+            import httplib
+            import urlparse
+
+            parsed = urlparse.urlparse(url)
+            h = httplib.HTTPConnection(parsed.netloc)
+            h.request('HEAD', parsed.path)
+            response = h.getresponse()
+
+        if response.status >= 300 and response.status < 400:
+                return resolveUrl(response.getheader("Location"))
+        else:
+                return url
+
+    except:
+        return url
+
+
+def onUrlFound(url):
+    """
+    Called by onPacketFound, if the packet contains a url.
+    """
+
+    url = resolveUrl(url)
+    sys.stdout.write(url)
+    sys.stdout.write("\n")
+    sys.stdout.flush()
+
+
+foundPackets = set()
+
+def onPacketFound(packet):
+    """
+    Called by the scan function for each beacon packets found.
+    """
+
+    data = bytearray.fromhex(packet)
+
+    if args.one:
+        tmp = packet[:-3]
+        if tmp in foundPackets:
+            return
+        foundPackets.add(tmp)
+
+    # Eddystone
+    if len(data) >= 20 and data[19] == 0xaa and data[20] == 0xfe:
+        serviceDataLength = data[21]
+        frameType = data[25]
+
+        # Eddystone-URL
+        if frameType == 0x10:
+            verboseOutput("Eddystone-URL")
+            onUrlFound(decodeUrl(data[27:22 + serviceDataLength]))
+        elif frameType == 0x00:
+            verboseOutput("Eddystone-UID")
+        elif frameType == 0x20:
+            verboseOutput("Eddystone-TLM")
+        else:
+            verboseOutput("Unknown Eddystone frame type: {}".format(frameType))
+
+    # UriBeacon
+    elif len(data) >= 20 and data[19] == 0xd8 and data[20] == 0xfe:
+        serviceDataLength = data[21]
+        verboseOutput("UriBeacon")
+        onUrlFound(decodeUrl(data[27:22 + serviceDataLength]))
+
+    else:
+        verboseOutput("Unknown beacon type")
+
+    verboseOutput(packet)
+    verboseOutput()
+
+
+def scan(duration = None):
+    """
+    Scan for beacons. This function scans for [duration] seconds. If duration
+    is set to None, it scans until interrupted.
+    """
+
+    print("Scanning...")
+    subprocess.call("sudo hciconfig hci0 reset", shell = True, stdout = DEVNULL)
+
+    lescan = subprocess.Popen(
+            ["sudo", "-n", "hcitool", "lescan", "--duplicates"],
+            stdout = DEVNULL)
+    
+    dump = subprocess.Popen(
+            ["sudo", "-n", "hcidump", "--raw"],
+            stdout = subprocess.PIPE)
+
+    packet = None
+    try:
+        startTime = time.time()
+        for line in dump.stdout:
+            line = line.decode()
+            if line.startswith("> "):
+                if packet: onPacketFound(packet)
+                packet = line[2:].strip()
+            elif line.startswith("< "):
+                if packet: onPacketFound(packet)
+                packet = None
+            else:
+                if packet: packet += " " + line.strip()
+
+            if duration and time.time() - startTime > duration:
+                break
+
+    except KeyboardInterrupt:
+        pass
+
+    subprocess.call(["sudo", "kill", str(dump.pid), "-s", "SIGINT"])
+    subprocess.call(["sudo", "-n", "kill", str(lescan.pid), "-s", "SIGINT"])
+
 
 def advertise(url):
     print("Advertising: " + url)
@@ -279,18 +324,19 @@ def stopAdvertising():
 def showVersion():
     print(application_name + " " + version)
 
-def main():
-    subprocess.call(["sudo", "-v"])
+def main():    
     if args.version:
         showVersion()
-    elif args.terminate:
-        stopAdvertising()
-    elif args.one:
-        scan(3)
-    elif args.scan:
-        scan()
     else:
-        advertise(args.url)
+        subprocess.call(["sudo", "-v"])
+        if args.terminate:
+            stopAdvertising()
+        elif args.one:
+            scan(3)
+        elif args.scan:
+            scan()
+        else:
+            advertise(args.url)
 
 if __name__ == "__main__":
     main()
