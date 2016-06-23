@@ -25,4 +25,4 @@ Python script for scanning and advertising urls over Eddystone-URL.
 		-t, --terminate       Stop advertising URL.
 		-o, --one             Scan one URL only.
 		-v, --version         Version of PyBeacon.
-		-V, --verbose         Print lots of debug output.
+		-V, --Verbose         Print lots of debug output.
