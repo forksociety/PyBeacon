@@ -1,5 +1,5 @@
 # PyBeacon
-Python script for scanning and advertising urls over Eddystone-URL.
+Python script for scanning and advertising urls over [Eddystone-URL](https://github.com/google/eddystone/tree/master/eddystone-url/implementations/PyBeacon).
 
 ## Requirements
 
