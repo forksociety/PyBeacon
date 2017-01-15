@@ -1,5 +1,5 @@
 __title__ = 'PyBeacon'
-__version__ = '0.2.6'
+__version__ = '0.2.7'
 __build__ = 0x016
 __author__ = 'Nirmankarta'
 __license__ = 'Apache 2.0'
