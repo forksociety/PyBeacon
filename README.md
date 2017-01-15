@@ -1,11 +1,13 @@
 # PyBeacon
-Python script for scanning and advertising urls over [Eddystone-URL](https://github.com/google/eddystone/tree/master/eddystone-url/implementations/PyBeacon).
+Python package for scanning and advertising [Eddystone-URL and Eddystone-UID](https://github.com/google/eddystone/tree/master/eddystone-url/implementations/PyBeacon).
 
 ## Requirements
 
 * Python 3.x (Scanning will not work on Python 2.x)
 * Bluez
     * sudo apt-get install bluez bluez-hcidump
+* Pip Packages
+    * pip install enum34
 
 ## Installation
 
