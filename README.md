@@ -21,6 +21,7 @@ Python script for scanning and advertising urls over [Eddystone-URL](https://git
 	optional arguments:
 		-h, --help            show this help message and exit
 		-u [URL], --url [URL] URL to advertise.
+		-i [UID], --uid [UID] UID to advertise.
 		-s, --scan            Scan for URLs.
 		-t, --terminate       Stop advertising URL.
 		-o, --one             Scan one URL only.

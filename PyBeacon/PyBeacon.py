@@ -25,6 +25,7 @@ import time
 import argparse
 from . import __version__
 from pprint import pprint
+from enum import Enum
 
 application_name = 'PyBeacon'
 version = __version__ + 'beta'
@@ -36,7 +37,10 @@ else:
     DEVNULL = open(os.devnull, 'wb')
 
 # The default url
-url = "https://goo.gl/SkcDTN"
+defaultUrl = "https://goo.gl/SkcDTN"
+
+# The default uid
+defaultUid = "01234567890123456789012345678901"
 
 schemes = [
         "http://www.",
@@ -45,15 +49,25 @@ schemes = [
         "https://",
         ]
 
+
+class Eddystone(Enum):
+    uid = 0x00
+    url = 0x10
+    tlm = 0x20
+
+
 extensions = [
         ".com/", ".org/", ".edu/", ".net/", ".info/", ".biz/", ".gov/",
         ".com", ".org", ".edu", ".net", ".info", ".biz", ".gov",
         ]
 
 parser = argparse.ArgumentParser(prog=application_name, description= __doc__)
+group = parser.add_mutually_exclusive_group()
 
-parser.add_argument("-u", "--url", nargs='?', const=url, type=str,
-    default=url, help='URL to advertise.')
+group.add_argument("-u", "--url", nargs='?', const=defaultUrl, type=str,
+                    default=defaultUrl, help='URL to advertise.')
+group.add_argument("-i", "--uid", nargs='?',  type=str,
+                    const=defaultUid, help='UID to advertise.')
 parser.add_argument('-s','--scan', action='store_true',
                     help='Scan for URLs.')
 parser.add_argument('-t','--terminate', action='store_true',
@@ -103,13 +117,38 @@ def encodeurl(url):
     return data
 
 
-def encodeMessage(url):
-    encodedurl = encodeurl(url)
-    encodedurlLength = len(encodedurl)
+def encodeUid(uid):
+    if not uidIsValid(uid):
+        raise ValueError("Invalid uid. Please specify a valid 16-byte (e.g 32 hex digits) hex string")
+    ret = []
+    for i in range(0, len(uid), 2):
+        ret.append(int(uid[i:i+2], 16))
+    ret.append(0x00)
+    ret.append(0x00)
+    return ret
 
-    verboseOutput("Encoded url length: " + str(encodedurlLength))
 
-    if encodedurlLength > 18:
+def uidIsValid(uid):
+    if len(uid) == 32:
+        try:
+            int(uid, 16)
+            return True
+        except ValueError:
+            return False
+    else:
+        return False
+
+
+def encodeMessage(data, beacon_type=Eddystone.url):
+    if beacon_type == Eddystone.url:
+        payload = encodeurl(data)
+    elif beacon_type == Eddystone.uid:
+        payload = encodeUid(data)
+    encodedmessageLength = len(payload)
+
+    verboseOutput("Encoded message length: " + str(encodedmessageLength))
+
+    if encodedmessageLength > 18:
         raise Exception("Encoded url too long (max 18 bytes)")
 
     message = [
@@ -122,16 +161,16 @@ def encodeMessage(url):
             0xaa,   # 16-bit Eddystone UUID
             0xfe,   # 16-bit Eddystone UUID
 
-            5 + len(encodedurl), # Service Data length
+            5 + len(payload), # Service Data length
             0x16,   # Service Data data type value
             0xaa,   # 16-bit Eddystone UUID
             0xfe,   # 16-bit Eddystone UUID
 
-            0x10,   # Eddystone-url frame type
+            beacon_type.value,   # Eddystone-url frame type
             0xed,   # txpower
             ]
 
-    message += encodedurl
+    message += payload
 
     return message
 
@@ -198,12 +237,21 @@ def onUrlFound(url):
     """
 
     url = resolveUrl(url)
+    sys.stdout.write("\n/*          Eddystone-URL         */\n")
     sys.stdout.write(url)
     sys.stdout.write("\n")
     sys.stdout.flush()
 
 
 foundPackets = set()
+
+
+def onUidFound(bytearray):
+    print("\n/*       Eddystone-UID      */")
+    namespace = ("".join(format(x, '02x') for x in bytearray[0:10]))
+    instance = ("".join(format(x, '02x') for x in bytearray[10:16]))
+    print("Namspace: {}\nInstance: {}\n".format(namespace, instance))
+
 
 def onPacketFound(packet):
     """
@@ -224,12 +272,11 @@ def onPacketFound(packet):
         frameType = data[25]
 
         # Eddystone-URL
-        if frameType == 0x10:
-            verboseOutput("Eddystone-URL")
+        if frameType == Eddystone.url.value:
             onUrlFound(decodeUrl(data[27:22 + serviceDataLength]))
-        elif frameType == 0x00:
-            verboseOutput("Eddystone-UID")
-        elif frameType == 0x20:
+        elif frameType == Eddystone.uid.value:
+            onUidFound(data[27:22 + serviceDataLength])
+        elif frameType == Eddystone.tlm.value:
             verboseOutput("Eddystone-TLM")
         else:
             verboseOutput("Unknown Eddystone frame type: {}".format(frameType))
@@ -259,7 +306,7 @@ def scan(duration = None):
     lescan = subprocess.Popen(
             ["sudo", "-n", "hcitool", "lescan", "--duplicates"],
             stdout = DEVNULL)
-    
+
     dump = subprocess.Popen(
             ["sudo", "-n", "hcidump", "--raw"],
             stdout = subprocess.PIPE)
@@ -288,9 +335,9 @@ def scan(duration = None):
     subprocess.call(["sudo", "-n", "kill", str(lescan.pid), "-s", "SIGINT"])
 
 
-def advertise(url):
-    print("Advertising: " + url)
-    message = encodeMessage(url)
+def advertise(ad, beacon_type=Eddystone.url):
+    print("Advertising: {} : {}".format(beacon_type.name, ad))
+    message = encodeMessage(ad, beacon_type)
 
     # Prepend the length of the whole message
     message.insert(0, len(message))
@@ -324,7 +371,7 @@ def stopAdvertising():
 def showVersion():
     print(application_name + " " + version)
 
-def main():    
+def main():
     if args.version:
         showVersion()
     else:
@@ -335,6 +382,8 @@ def main():
             scan(3)
         elif args.scan:
             scan()
+        elif args.uid:
+            advertise(args.uid, Eddystone.uid)
         else:
             advertise(args.url)
 
