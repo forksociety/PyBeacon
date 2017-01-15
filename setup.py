@@ -15,9 +15,9 @@ setup(
         "console_scripts": ['PyBeacon = PyBeacon.PyBeacon:main']
     },
     
-    description = 'Python script for scanning and advertising urls over Eddystone-URL.',
+    description = 'Python package for scanning and advertising Eddystone-URLs and Eddystone-UID.',
 
-    long_description = 'Python script for scanning and advertising urls over Eddystone-URL.',
+    long_description = 'Python package for scanning and advertising Eddystone-URLs and Eddystone-UID.',
 
     url = 'https://github.com/nirmankarta/PyBeacon',
 
@@ -51,5 +51,9 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+    ],
+
+    install_requires = [
+        'enum34'
     ],
 )
