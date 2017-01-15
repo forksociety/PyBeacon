@@ -1,5 +1,6 @@
 # PyBeacon
 Python package for scanning and advertising [Eddystone-URL and Eddystone-UID](https://github.com/google/eddystone/tree/master/eddystone-url/implementations/PyBeacon).
+Note: Please create you pull requests against dev branch.
 
 ## Requirements
 
