@@ -31,3 +31,9 @@ Note: Please create you pull requests against dev branch.
 		-o, --one             Scan one URL only.
 		-v, --version         Version of PyBeacon.
 		-V, --Verbose         Print lots of debug output.
+
+## Projects using PyBeacon
+* [PyBTSteward](https://github.com/wolfspyre/PyBTSteward)
+* [pikiosk](https://github.com/chriso0710/pikiosk)
+
+Please add your projects here if you are using PyBeacon's code so that similar projects can be accessed easily.
