@@ -13,9 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Python script for scanning and advertising urls over Eddystone-URL.
-"""
+"""Python script for scanning and advertising urls over Eddystone-URL."""
 import re
 import os
 import signal
@@ -51,6 +49,8 @@ schemes = [
 
 
 class Eddystone(Enum):
+    """Enumerator for Eddystone URL."""
+
     uid = 0x00
     url = 0x10
     tlm = 0x20
@@ -61,18 +61,18 @@ extensions = [
         ".com", ".org", ".edu", ".net", ".info", ".biz", ".gov",
         ]
 
-parser = argparse.ArgumentParser(prog=application_name, description= __doc__)
+parser = argparse.ArgumentParser(prog=application_name, description=__doc__)
 group = parser.add_mutually_exclusive_group()
 
 group.add_argument("-u", "--url", nargs='?', const=defaultUrl, type=str,
-                    default=defaultUrl, help='URL to advertise.')
+                   default=defaultUrl, help='URL to advertise.')
 group.add_argument("-i", "--uid", nargs='?',  type=str,
-                    const=defaultUid, help='UID to advertise.')
-parser.add_argument('-s','--scan', action='store_true',
+                   const=defaultUid, help='UID to advertise.')
+parser.add_argument('-s', '--scan', action='store_true',
                     help='Scan for URLs.')
-parser.add_argument('-t','--terminate', action='store_true',
+parser.add_argument('-t', '--terminate', action='store_true',
                     help='Stop advertising URL.')
-parser.add_argument('-o','--one', action='store_true',
+parser.add_argument('-o', '--one', action='store_true',
                     help='Scan one URL only.')
 parser.add_argument("-v", "--version", action='store_true',
                     help='Version of ' + application_name + '.')
@@ -81,12 +81,15 @@ parser.add_argument("-V", "--Verbose", action='store_true',
 
 args = parser.parse_args()
 
-def verboseOutput(text = ""):
+
+def verboseOutput(text=""):
+    """Verbose output logger."""
     if args.Verbose:
         sys.stderr.write(text + "\n")
 
 
 def encodeurl(url):
+    """URL Encoder."""
     i = 0
     data = []
 
@@ -118,8 +121,10 @@ def encodeurl(url):
 
 
 def encodeUid(uid):
+    """UID Encoder."""
     if not uidIsValid(uid):
-        raise ValueError("Invalid uid. Please specify a valid 16-byte (e.g 32 hex digits) hex string")
+        raise ValueError("Invalid uid. Please specify a valid \
+                         16-byte (e.g 32 hex digits) hex string")
     ret = []
     for i in range(0, len(uid), 2):
         ret.append(int(uid[i:i+2], 16))
@@ -129,6 +134,7 @@ def encodeUid(uid):
 
 
 def uidIsValid(uid):
+    """UID Validation."""
     if len(uid) == 32:
         try:
             int(uid, 16)
@@ -140,6 +146,7 @@ def uidIsValid(uid):
 
 
 def encodeMessage(data, beacon_type=Eddystone.url):
+    """Message encoder."""
     if beacon_type == Eddystone.url:
         payload = encodeurl(data)
     elif beacon_type == Eddystone.uid:
@@ -161,7 +168,7 @@ def encodeMessage(data, beacon_type=Eddystone.url):
             0xaa,   # 16-bit Eddystone UUID
             0xfe,   # 16-bit Eddystone UUID
 
-            5 + len(payload), # Service Data length
+            5 + len(payload),  # Service Data length
             0x16,   # Service Data data type value
             0xaa,   # 16-bit Eddystone UUID
             0xfe,   # 16-bit Eddystone UUID
@@ -174,11 +181,13 @@ def encodeMessage(data, beacon_type=Eddystone.url):
 
     return message
 
+
 def decodeUrl(encodedUrl):
     """
-    Decode a url encoded with the Eddystone (or UriBeacon) URL encoding scheme
-    """
+    Decode a url.
 
+    URL must be encoded with the Eddystone (or UriBeacon) URL encoding scheme.
+    """
     decodedUrl = schemes[encodedUrl[0]]
     for c in encodedUrl[1:]:
         if c <= 0x20:
@@ -190,10 +199,7 @@ def decodeUrl(encodedUrl):
 
 
 def resolveUrl(url):
-    """
-    Follows redirects until the final url is found.
-    """
-
+    """Follow redirects until the final url is found."""
     try:
         if (sys.version_info > (3, 0)):
             import http.client
@@ -232,10 +238,7 @@ def resolveUrl(url):
 
 
 def onUrlFound(url):
-    """
-    Called by onPacketFound, if the packet contains a url.
-    """
-
+    """Called by onPacketFound, if the packet contains a url."""
     url = resolveUrl(url)
     sys.stdout.write("\n/*          Eddystone-URL         */\n")
     sys.stdout.write(url)
@@ -247,6 +250,7 @@ foundPackets = set()
 
 
 def onUidFound(bytearray):
+    """Called by onPacketFound when frametype is Eddystone UID."""
     print("\n/*       Eddystone-UID      */")
     namespace = ("".join(format(x, '02x') for x in bytearray[0:10]))
     instance = ("".join(format(x, '02x') for x in bytearray[10:16]))
@@ -254,10 +258,7 @@ def onUidFound(bytearray):
 
 
 def onPacketFound(packet):
-    """
-    Called by the scan function for each beacon packets found.
-    """
-
+    """Called by the scan function for each beacon packets found."""
     data = bytearray.fromhex(packet)
 
     if args.one:
@@ -294,22 +295,23 @@ def onPacketFound(packet):
     verboseOutput()
 
 
-def scan(duration = None):
+def scan(duration=None):
     """
-    Scan for beacons. This function scans for [duration] seconds. If duration
-    is set to None, it scans until interrupted.
-    """
+    Scan for beacons.
 
+    This function scans for [duration] seconds.
+    If duration is set to None, it scans until interrupted.
+    """
     print("Scanning...")
-    subprocess.call("sudo hciconfig hci0 reset", shell = True, stdout = DEVNULL)
+    subprocess.call("sudo hciconfig hci0 reset", shell=True, stdout=DEVNULL)
 
     lescan = subprocess.Popen(
             ["sudo", "-n", "hcitool", "lescan", "--duplicates"],
-            stdout = DEVNULL)
+            stdout=DEVNULL)
 
     dump = subprocess.Popen(
             ["sudo", "-n", "hcidump", "--raw"],
-            stdout = subprocess.PIPE)
+            stdout=subprocess.PIPE)
 
     packet = None
     try:
@@ -317,13 +319,16 @@ def scan(duration = None):
         for line in dump.stdout:
             line = line.decode()
             if line.startswith("> "):
-                if packet: onPacketFound(packet)
+                if packet:
+                    onPacketFound(packet)
                 packet = line[2:].strip()
             elif line.startswith("< "):
-                if packet: onPacketFound(packet)
+                if packet:
+                    onPacketFound(packet)
                 packet = None
             else:
-                if packet: packet += " " + line.strip()
+                if packet:
+                    packet += " " + line.strip()
 
             if duration and time.time() - startTime > duration:
                 break
@@ -336,6 +341,7 @@ def scan(duration = None):
 
 
 def advertise(ad, beacon_type=Eddystone.url):
+    """Advertise an eddystone URL."""
     print("Advertising: {} : {}".format(beacon_type.name, ad))
     message = encodeMessage(ad, beacon_type)
 
@@ -343,7 +349,8 @@ def advertise(ad, beacon_type=Eddystone.url):
     message.insert(0, len(message))
 
     # Pad message to 32 bytes for hcitool
-    while len(message) < 32: message.append(0x00)
+    while len(message) < 32:
+        message.append(0x00)
 
     # Make a list of hex strings from the list of numbers
     message = map(lambda x: "%02x" % x, message)
@@ -352,26 +359,36 @@ def advertise(ad, beacon_type=Eddystone.url):
     message = " ".join(message)
     verboseOutput("Message: " + message)
 
-    subprocess.call("sudo hciconfig hci0 up", shell = True, stdout = DEVNULL)
+    subprocess.call("sudo hciconfig hci0 up",
+                    shell=True, stdout=DEVNULL)
 
     # Stop advertising
-    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x000a 00", shell = True, stdout = DEVNULL)
+    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x000a 00",
+                    shell=True, stdout=DEVNULL)
 
     # Set message
-    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x0008 " + message, shell = True, stdout = DEVNULL)
+    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x0008 " + message,
+                    shell=True, stdout=DEVNULL)
 
     # Resume advertising
-    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x000a 01", shell = True, stdout = DEVNULL)
+    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x000a 01",
+                    shell=True, stdout=DEVNULL)
 
 
 def stopAdvertising():
+    """Stop advertising."""
     print("Stopping advertising")
-    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x000a 00", shell = True, stdout = DEVNULL)
+    subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x000a 00",
+                    shell=True, stdout=DEVNULL)
+
 
 def showVersion():
+    """Show version."""
     print(application_name + " " + version)
 
+
 def main():
+    """Main function."""
     if args.version:
         showVersion()
     else:
@@ -386,6 +403,7 @@ def main():
             advertise(args.uid, Eddystone.uid)
         else:
             advertise(args.url)
+
 
 if __name__ == "__main__":
     main()
