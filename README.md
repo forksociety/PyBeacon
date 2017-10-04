@@ -1,4 +1,6 @@
 # PyBeacon
+[![Build Status](https://travis-ci.org/nirmankarta/PyBeacon.svg?branch=master)](https://travis-ci.org/nirmankarta/PyBeacon)
+
 Python package for scanning and advertising [Eddystone-URL and Eddystone-UID](https://github.com/google/eddystone/tree/master/eddystone-url/implementations/PyBeacon).
 
 Note: Please create you pull requests against dev branch.
@@ -31,3 +33,9 @@ Note: Please create you pull requests against dev branch.
 		-o, --one             Scan one URL only.
 		-v, --version         Version of PyBeacon.
 		-V, --Verbose         Print lots of debug output.
+
+## Projects using PyBeacon
+* [PyBTSteward](https://github.com/wolfspyre/PyBTSteward)
+* [pikiosk](https://github.com/chriso0710/pikiosk)
+
+Please add your projects here if you are using PyBeacon's code so that similar projects can be accessed easily.
