@@ -25,7 +25,7 @@ setup(
     download_url='https://github.com/nirmankarta/PyBeacon/archive/master.zip',
     author='Nirmankarta',
     author_email='we@nirmankarta.com',
-    license='Apache License 2.0',
+    license='GNU Affero General Public License v3 or later (AGPLv3+)',
     keywords=['Eddystone', 'Eddystone URL', 'Beacon', 'Raspberry Pi'],
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -35,7 +35,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Natural Language :: English',
         'Operating System :: POSIX :: Linux',
-        'License :: OSI Approved :: Apache Software License',
+        'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
