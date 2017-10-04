@@ -66,12 +66,12 @@ parser.add_argument("-V", "--Verbose", action='store_true',
 
 args = parser.parse_args()
 
+foundPackets = set()
 
 def verboseOutput(text=""):
     """Verbose output logger."""
     if args.Verbose:
         sys.stderr.write(text + "\n")
-
 
 def encodeurl(url):
     """URL Encoder."""
@@ -104,19 +104,16 @@ def encodeurl(url):
 
     return data
 
-
 def encodeUid(uid):
     """UID Encoder."""
     if not uidIsValid(uid):
-        raise ValueError("Invalid uid. Please specify a valid \
-                         16-byte (e.g 32 hex digits) hex string")
+        raise ValueError("Invalid uid. Please specify a valid 16-byte (e.g 32 hex digits) hex string")
     ret = []
     for i in range(0, len(uid), 2):
         ret.append(int(uid[i:i+2], 16))
     ret.append(0x00)
     ret.append(0x00)
     return ret
-
 
 def uidIsValid(uid):
     """UID Validation."""
@@ -128,7 +125,6 @@ def uidIsValid(uid):
             return False
     else:
         return False
-
 
 def encodeMessage(data, beacon_type=Eddystone.url):
     """Message encoder."""
@@ -166,7 +162,6 @@ def encodeMessage(data, beacon_type=Eddystone.url):
 
     return message
 
-
 def decodeUrl(encodedUrl):
     """
     Decode a url.
@@ -181,7 +176,6 @@ def decodeUrl(encodedUrl):
             decodedUrl += chr(c)
 
     return decodedUrl
-
 
 def resolveUrl(url):
     """Follow redirects until the final url is found."""
@@ -221,7 +215,6 @@ def resolveUrl(url):
     except:
         return url
 
-
 def onUrlFound(url):
     """Called by onPacketFound, if the packet contains a url."""
     url = resolveUrl(url)
@@ -230,17 +223,12 @@ def onUrlFound(url):
     sys.stdout.write("\n")
     sys.stdout.flush()
 
-
-foundPackets = set()
-
-
 def onUidFound(bytearray):
     """Called by onPacketFound when frametype is Eddystone UID."""
     print("\n/*       Eddystone-UID      */")
     namespace = ("".join(format(x, '02x') for x in bytearray[0:10]))
     instance = ("".join(format(x, '02x') for x in bytearray[10:16]))
     print("Namspace: {}\nInstance: {}\n".format(namespace, instance))
-
 
 def onPacketFound(packet):
     """Called by the scan function for each beacon packets found."""
@@ -278,7 +266,6 @@ def onPacketFound(packet):
 
     verboseOutput(packet)
     verboseOutput()
-
 
 def scan(duration=None):
     """
@@ -324,7 +311,6 @@ def scan(duration=None):
     subprocess.call(["sudo", "kill", str(dump.pid), "-s", "SIGINT"])
     subprocess.call(["sudo", "-n", "kill", str(lescan.pid), "-s", "SIGINT"])
 
-
 def advertise(ad, beacon_type=Eddystone.url):
     """Advertise an eddystone URL."""
     print("Advertising: {} : {}".format(beacon_type.name, ad))
@@ -359,18 +345,15 @@ def advertise(ad, beacon_type=Eddystone.url):
     subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x000a 01",
                     shell=True, stdout=DEVNULL)
 
-
 def stopAdvertising():
     """Stop advertising."""
     print("Stopping advertising")
     subprocess.call("sudo hcitool -i hci0 cmd 0x08 0x000a 00",
                     shell=True, stdout=DEVNULL)
 
-
 def showVersion():
     """Show version."""
     print(application_name + " " + version)
-
 
 def main():
     """Main function."""
@@ -388,7 +371,6 @@ def main():
             advertise(args.uid, Eddystone.uid)
         else:
             advertise(args.url)
-
 
 if __name__ == "__main__":
     main()
