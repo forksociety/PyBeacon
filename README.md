@@ -1,5 +1,8 @@
 # PyBeacon
 [![Build Status](https://travis-ci.org/nirmankarta/PyBeacon.svg?branch=master)](https://travis-ci.org/nirmankarta/PyBeacon)
+[![Python: 3](https://img.shields.io/badge/python-3-brightgreen.svg)](https://docs.python.org/3/)
+[![Python: 2](https://img.shields.io/badge/python-2-lightgrey.svg)](https://docs.python.org/2/)
+[![Slack](https://img.shields.io/badge/Slack%20channel-%20%20-blue.svg)](http://nirmankarta.herokuapp.com)
 
 Python package for scanning and advertising [Eddystone-URL and Eddystone-UID](https://github.com/google/eddystone/tree/master/eddystone-url/implementations/PyBeacon).
 
