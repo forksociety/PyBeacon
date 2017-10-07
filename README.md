@@ -1,13 +1,13 @@
 # PyBeacon
+[![Open Source Love](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-red.svg)](https://github.com/nirmankarta/PyBeacon)
 [![Build Status](https://travis-ci.org/nirmankarta/PyBeacon.svg?branch=master)](https://travis-ci.org/nirmankarta/PyBeacon)
 [![PyPI](https://img.shields.io/pypi/v/PyBeacon.svg)](https://pypi.python.org/pypi/PyBeacon)
+[![Operating System](https://img.shields.io/badge/Operating%20System-Linux-blue.svg)](https://en.wikipedia.org/wiki/Linux)
 [![Python: 3](https://img.shields.io/badge/python-3-brightgreen.svg)](https://docs.python.org/3/)
-[![Python: 2](https://img.shields.io/badge/python-2-lightgrey.svg)](https://docs.python.org/2/)
+[![Python: 2](https://img.shields.io/badge/python-2-lightgrey.svg)](https://docs.python.org/2/)  
+[![Contributors](https://img.shields.io/github/contributors/cdnjs/cdnjs.svg)](https://github.com/nirmankarta/PyBeacon/graphs/contributors)
 [![Slack](https://img.shields.io/badge/Slack%20channel-%20%20-blue.svg)](http://nirmankarta.herokuapp.com)
 [![PyPI](https://img.shields.io/pypi/l/PyBeacon.svg)](https://github.com/nirmankarta/PyBeacon/blob/master/LICENSE)
-[![Contributors](https://img.shields.io/github/contributors/cdnjs/cdnjs.svg)](https://github.com/nirmankarta/PyBeacon/graphs/contributors)
-[![Open Source Love](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-red.svg)](https://github.com/nirmankarta/PyBeacon)
-[![Operating System](https://img.shields.io/badge/Operating%20System-Linux-blue.svg)](https://en.wikipedia.org/wiki/Linux)
 
 Python package for scanning and advertising [Eddystone-URL and Eddystone-UID](https://github.com/google/eddystone/tree/master/eddystone-url/implementations/PyBeacon).
 
