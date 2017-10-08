@@ -28,4 +28,4 @@ deploy:
   password: $PYPI_PASSWORD
   on:
     branch: master
-    condition: $SHOULD_DEPLOY
+    condition: $SHOULD_DEPLOY = 1
