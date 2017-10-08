@@ -17,3 +17,15 @@ before_install:
 install: "python setup.py install"
 
 script: py.test
+
+before_deploy:
+  - function version_gt() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; } && IFS="'" read _ version _ <<< $(echo "$a" | sed '3q;d' PyBeacon/__init__.py) && export VERSION_FOUND=$(echo $version | awk -F"'" '{print $1}') SHOULD_DEPLOY=0 && echo "Current version':' ${PB_VERSION} and version found':' ${VERSION_FOUND}" && if version_gt $VERSION_FOUND $PB_VERSION; then echo "Latest version ${VERSION_FOUND} will be deployed" && export SHOULD_DEPLOY=1 PB_VERSION=$(echo "${VERSION_FOUND}");fi
+
+deploy:
+  provider: pypi
+  distributions: "sdist bdist_wheel"
+  user: nirmankarta
+  password: $PYPI_PASSWORD
+  on:
+    branch: master
+    condition: $SHOULD_DEPLOY
