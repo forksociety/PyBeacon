@@ -11,7 +11,7 @@ from pprint import pprint
 from enum import Enum
 
 application_name = 'PyBeacon'
-version = __version__ + 'beta'
+version = __version__
 
 
 if (sys.version_info > (3, 0)):
