@@ -48,6 +48,12 @@ You can contribute in many ways:
 
 7. Submit a pull request through the [GitHub website](https://github.com/nirmankarta/PyBeacon).
 
+## How to contribute?
+* Follow the Getting Started guidelines to get a headstart.
+* Create an issue first and then get it approved before creating a PR to allow for better management.
+* Make sure to make PRs against the `dev` branch.
+* No trivial edits, ie. simply rearranging topics will not be accepted.
+
 ## Types of Contributions
 
 You can contribute in many ways:

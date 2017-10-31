@@ -10,9 +10,7 @@
 
 Python package for scanning and advertising [Eddystone-URL and Eddystone-UID](https://github.com/google/eddystone/tree/master/eddystone-url/implementations/PyBeacon).
 
-Note: Please create your pull requests against dev branch.
-
-Please read [contribution.md](https://github.com/nirmankarta/PyBeacon/blob/master/CONTRIBUTING.md) before making any kind of contribution.
+**Note:** Please read [contribution.md](https://github.com/nirmankarta/PyBeacon/blob/master/CONTRIBUTING.md) before making any kind of contribution.
 
 ## Requirements
 
