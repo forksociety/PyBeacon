@@ -21,10 +21,10 @@ setup(
     Eddystone-URLs and Eddystone-UID.',
     long_description='Python package for scanning and advertising \
     Eddystone-URLs and Eddystone-UID.',
-    url='https://github.com/nirmankarta/PyBeacon',
-    download_url='https://github.com/nirmankarta/PyBeacon/archive/master.zip',
-    author='Nirmankarta',
-    author_email='we@nirmankarta.com',
+    url='https://github.com/forksociety/PyBeacon',
+    download_url='https://github.com/forksociety/PyBeacon/archive/master.zip',
+    author='forksociety',
+    author_email='os@forksociety.com',
     license='GNU Affero General Public License v3 or later (AGPLv3+)',
     keywords=['Eddystone', 'Eddystone URL', 'Beacon', 'Raspberry Pi'],
     classifiers=[
