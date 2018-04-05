@@ -46,7 +46,7 @@ You can contribute in many ways:
   $ git push origin name-of-your-bugfix-or-feature
   ```
 
-7. Submit a pull request through the [GitHub website](https://github.com/nirmankarta/PyBeacon).
+7. Submit a pull request through the [GitHub website](https://github.com/forksociety/PyBeacon).
 
 ## How to contribute?
 * Follow the Getting Started guidelines to get a headstart.
@@ -60,7 +60,7 @@ You can contribute in many ways:
 
 ### Report Bugs
 
-Report bugs at https://github.com/nirmankarta/PyBeacon/issues.
+Report bugs at https://github.com/forksociety/PyBeacon/issues.
 
 If you are reporting a bug, please include:
 
@@ -70,7 +70,7 @@ If you are reporting a bug, please include:
 
 ### Fix Bugs
 
-Look through the [GitHub issues](https://github.com/nirmankarta/PyBeacon/issues) for bugs. Anything tagged with "bug"
+Look through the [GitHub issues](https://github.com/forksociety/PyBeacon/issues) for bugs. Anything tagged with "bug"
 and "help wanted" is open to whoever wants to implement it.
 
 ### Implement Features
@@ -86,7 +86,7 @@ articles, and such.
 
 ### Submit Feedback
 
-The best way to send feedback is to file an issue at https://github.com/nirmankarta/PyBeacon/issues.
+The best way to send feedback is to file an issue at https://github.com/forksociety/PyBeacon/issues.
 
 If you are proposing a feature:
 
