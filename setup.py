@@ -28,7 +28,7 @@ setup(
     license='GNU Affero General Public License v3 or later (AGPLv3+)',
     keywords=['Eddystone', 'Eddystone URL', 'Beacon', 'Raspberry Pi'],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
